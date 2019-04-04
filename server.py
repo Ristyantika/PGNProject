@@ -22,53 +22,60 @@ while True:
    print("--- Welcome to Our Prototype ---")
    print("1. Input Survival Time Data")
    print("2. Input GTM type to MS")
+   print("3. Merubah Status GTM")
    option = input("Select Number : ")
    if option=='1':
        SurvivalTable = pd.read_csv('SurvivalTable.csv', skiprows = [0], header = None)
-       #print("\n")
        PRS = str(input("PRS Code :"))
        pressure = int(input("Pressure :"))
        flow = int(input("Flow :"))
        capasity = int(input("Capasity GTM :"))
+           
        survivaltime = (pressure * (capasity/200)) / flow
-       data = np.array([[PRS, survivaltime]])
-       data = pd.DataFrame(data)
-       SurvivalTable= SurvivalTable.append(data)
-       SuvTime[PRS] = survivaltime
+       SurvivalTable[PRS] = survivaltime
        SurvivalTable.to_csv('SurvivalTable.csv', index=False)
-       
+           
        dataset = pd.read_csv('input.csv', skiprows = [0], header = None)
        dataset = dataset.to_numpy()
        category = {}
        produksi = {}
        Distance = {}
-       DisMS = {}
+         
+       MotherStation = ['SPBG', 'INDOGAS', 'JES', 'PURWAKARTA']
        for i in range(len(dataset)):
+           DisMS = {}
            PRSname = dataset[i][0]
            category[PRSname] = dataset[i][1]
            produksi[PRSname] = dataset[i][2]
-           DisMS['SPBG'] = int(dataset[i][3]/20)
-           DisMS['INDOGAS'] = int(dataset[i][4]/20)
-           DisMS['JES'] = int(dataset[i][5]/20)
-           DisMS['PURWAKARTA'] = int(dataset[i][6]/20)
+           DisMS['SPBG'] = float(dataset[i][3]/20.0)
+           DisMS['INDOGAS'] = dataset[i][4]/20.0
+           DisMS['JES'] = dataset[i][5]/20.0
+           DisMS['PURWAKARTA'] = dataset[i][6]/20.0
            Distance[PRSname] = DisMS
-       GTMinMS = pd.read_csv('GTMinMS.csv', skiprows = [0], header = None)
-       row, column = GTMinMS.shape
-       GTMinMS = GTMinMS.to_numpy()
        GTMReady = {}
-       for i in range(len(GTMinMS)):
-           if Distance[PRS][GTMinMS[i][1]] == 0.0:
+       for i in MotherStation:
+           if Distance[PRS][i] == 0.0:
                continue
-           if survivaltime > Distance[PRS][GTMinMS[i][1]]:
-               GTMReady[GTMinMS[i][1]] = Distance[PRS][GTMinMS[i][1]]
+           if survivaltime > Distance[PRS][i]:
+               GTMReady[i] = Distance[PRS][i]
        sorted_x = sorted(GTMReady.items(), key=operator.itemgetter(1))
        c.send(str(next(iter(GTMReady))).encode('utf-8'))
-   else:
-       GTMinMS = pd.read_csv('GTMinMS.csv', skiprows = [0], header = None)
+   elif option=='2':
+       GTMaster = pd.read_csv('GTM.csv')
        GTM = input("GTM Type :")
        PRS = input("MS Type :")
-       data = np.array([[GTM, PRS]])
-       data = pd.DataFrame(data)
-       GTMinMS= GTMinMS.append(data)
-       GTMinMS.to_csv('GTMinMS.csv', index=False)
+#       data = np.array([[GTM, PRS]])
+#       data = pd.DataFrame(data)
+#       GTMinMS= GTMinMS.append(data)
+       GTMaster[GTM][1]= PRS
+       GTMinMS.to_csv('GTM.csv', index=False)
+   elif option=='3':
+       GTMaster = pd.read_csv('GTM.csv')
+       GTM = input("GTM Type : ")
+       Status = input("Status GTM : ")
+       if Status == "OUT":
+           GTMaster[GTM][1] = "OutMS"
+       GTMaster[GTM][2]= Status
+       GTMinMS.to_csv('GTM.csv', index=False)
+      
    c.close()
