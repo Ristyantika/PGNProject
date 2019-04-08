@@ -48,3 +48,7 @@ if Status == "OUT":
     GTMtoPRS = GTMaster[GTM][3]
 #    c.send(str(GTMtoPRS).encode('utf-8'))
 GTMaster[GTM][2]= Status
+
+
+
+

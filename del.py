@@ -9,41 +9,78 @@ import pandas as pd
 import numpy as np
 import operator
 
-SurvivalTable = pd.read_csv('SurvivalTable.csv', skiprows = [0], header = None)
-PRS = str(input("PRS Code :"))
-pressure = int(input("Pressure :"))
-flow = int(input("Flow :"))
-capasity = int(input("Capasity GTM :"))
-   
-survivaltime = (pressure * (capasity/200)) / flow
-SurvivalTable[PRS] = survivaltime
-SurvivalTable.to_csv('SurvivalTable.csv', index=False)
-   
-dataset = pd.read_csv('input.csv', skiprows = [0], header = None)
-dataset = dataset.to_numpy()
+dataset = pd.read_csv('input.csv')
 category = {}
 produksi = {}
 Distance = {}
-
-
-MotherStation = ['SPBG', 'INDOGAS', 'JES', 'PURWAKARTA']
-for i in range(len(dataset)):
+size = {}
+for i in range(len(dataset["PRS"])):
     DisMS = {}
-    PRSname = dataset[i][0]
-    category[PRSname] = dataset[i][1]
-    produksi[PRSname] = dataset[i][2]
-    DisMS['SPBG'] = float(dataset[i][3]/20.0)
-#    print(dataset[i][3]/20.0)
-#    print(PRSname)
-    DisMS['INDOGAS'] = dataset[i][4]/20.0
-    DisMS['JES'] = dataset[i][5]/20.0
-    DisMS['PURWAKARTA'] = dataset[i][6]/20.0
-    print(DisMS)
+    PRSname = dataset["PRS"][i]
+    category[PRSname] = dataset["CATEGORY"][i]
+    produksi[PRSname] = dataset["PRODUCT"][i]
+    DisMS['SPBG'] = dataset["SPBG"][i]/20.0
+    DisMS['INDOGAS'] = dataset["INDOGAS"][i]/20.0
+    DisMS['JES'] = dataset["JES"][i]/20.0
+    DisMS['PURWAKARTA'] = dataset["PURWAKARTA"][i]/20.0
+    size[PRSname] = dataset["SIZE"][i]
     Distance[PRSname] = DisMS
+
+PRS = str(input("PRS Code :"))
+SurvivalTable = pd.read_csv('SurvivalTable.csv')
+survivaltime = SurvivalTable[PRS][0]
+print(survivaltime)
+
+GTMaster = pd.read_csv('GTM.csv')
 GTMReady = {}
-for i in MotherStation:
-    if Distance[PRS][i] == 0.0:
-        continue
-    if survivaltime > Distance[PRS][i]:
-        GTMReady[i] = Distance[PRS][i]
+for i in GTMaster:
+    if GTMaster[i][2] == 'StandBy' and int(GTMaster[i][0]) == size[PRS] and survivaltime > Distance[PRS][GTMaster[i][1]]:
+        GTMReady[i] = Distance[PRS][GTMaster[i][1]]
 sorted_x = sorted(GTMReady.items(), key=operator.itemgetter(1))
+print(sorted_x[0][0])
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    

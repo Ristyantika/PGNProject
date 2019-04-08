@@ -40,6 +40,7 @@ while True:
    print("1. Input Survival Time Data")
    print("2. Input GTM type to MS")
    print("3. Merubah Status GTM")
+   print("4. Request GTM for PRS")
    option = input("Select Number : ")
    if option=='1':
        SurvivalTable = pd.read_csv('SurvivalTable.csv')
@@ -62,12 +63,12 @@ while True:
    elif option=='3':
        GTMaster = pd.read_csv('GTM.csv')
        GTM = input("GTM Type : ")
-       if GTMaster[GTM][0] == 40:
-           sizeGTM = "large"
-       elif GTMaster[GTM][0] == 5:
-            sizeGTM = "small"
-       else:
-           sizeGTM = "medium"
+#       if GTMaster[GTM][0] == 40:
+#           sizeGTM = "large"
+#       elif GTMaster[GTM][0] == 5:
+#            sizeGTM = "small"
+#       else:
+#           sizeGTM = "medium"
        Status = input("Status GTM : ")
        if Status == "OUT":
            GTMtoPRS = GTMaster[GTM][3]
@@ -76,7 +77,7 @@ while True:
            PRSReady = {}
            SurvivalTable = pd.read_csv('SurvivalTable.csv')
            for i in dataset[:]["PRS"]:
-               if SurvivalTable[i][0] > Distance[i][GTMaster[GTM][1]] and size[i] == sizeGTM and Distance[i][GTMaster[GTM][1]] > 0.0 :
+               if SurvivalTable[i][0] > Distance[i][GTMaster[GTM][1]] and size[i] == GTMaster[GTM][0] and Distance[i][GTMaster[GTM][1]] > 0.0 :
                    PRSReady[i] = SurvivalTable[i][0]
            sorted_x = sorted(PRSReady.items(), key=operator.itemgetter(1))
            minST = sorted_x[0][1]
@@ -96,5 +97,17 @@ while True:
            c.send(str(GTMtoPRS).encode('utf-8'))
        GTMaster[GTM][2]= Status
        GTMaster.to_csv('GTM.csv', index=False)
-       
+   elif option=='4':
+       PRS = str(input("PRS Code :"))
+       SurvivalTable = pd.read_csv('SurvivalTable.csv')
+       survivaltime = SurvivalTable[PRS][0]
+       GTMaster = pd.read_csv('GTM.csv')
+       GTMReady = {}
+       for i in GTMaster:
+           if GTMaster[i][2] == 'StandBy' and int(GTMaster[i][0]) == size[PRS] and survivaltime > Distance[PRS][GTMaster[i][1]]:
+               GTMReady[i] = Distance[PRS][GTMaster[i][1]]
+       sorted_x = sorted(GTMReady.items(), key=operator.itemgetter(1))
+       GTMaster[sorted_x[0][0]][2] = 'OUT'
+       c.send(str(sorted_x[0][0]).encode('utf-8'))
+       GTMaster.to_csv('GTM.csv', index=False)
    c.close()
