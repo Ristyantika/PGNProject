@@ -20,19 +20,15 @@ for i in range(len(dataset["PRS"])):
 
 GTMaster = pd.read_csv('GTM.csv')
 GTM = input("GTM Type : ")
-if GTMaster[GTM][0] == 40:
-    sizeGTM = "large"
-elif GTMaster[GTM][0] == 5:
-    sizeGTM = "small"
-else:
-    sizeGTM = "medium"
 Status = input("Status GTM : ")
-if Status == "Stand-By":
+       
+if Status == "StandBy":
     PRSReady = {}
     SurvivalTable = pd.read_csv('SurvivalTable.csv')
     for i in dataset[:]["PRS"]:
-        if SurvivalTable[i][0] > Distance[i][GTMaster[GTM][1]] and size[i] == sizeGTM and Distance[i][GTMaster[GTM][1]] > 0.0 :
+        if SurvivalTable[i][0] > Distance[i][GTMaster[GTM][1]] and size[i] == int(GTMaster[GTM][0]) and Distance[i][GTMaster[GTM][1]] > 0.0 :
             PRSReady[i] = SurvivalTable[i][0]
+    print(PRSReady)
     sorted_x = sorted(PRSReady.items(), key=operator.itemgetter(1))
     minST = sorted_x[0][1]
     Prioritas = {}
@@ -42,12 +38,16 @@ if Status == "Stand-By":
     sorted_y = sorted(Prioritas.items(), key=operator.itemgetter(1))
     if SurvivalTable[i][0] - Distance[i][GTMaster[GTM][1]] < 1.0:
         Status = "OUT"
+        GTMtoPRS = sorted_y[0][0]
     else:
         GTMaster[GTM][3] = sorted_y[0][0]
+        message = "Survival Time masih Lama"
+        print(message)
+#        c.send(str(sorted_y[0][0]).encode('utf-8'))
 if Status == "OUT":
-    GTMtoPRS = GTMaster[GTM][3]
 #    c.send(str(GTMtoPRS).encode('utf-8'))
-GTMaster[GTM][2]= Status
+    GTMaster[GTM][2]= Status
+    print(GTMtoPRS)
 
 
 

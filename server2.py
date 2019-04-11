@@ -63,21 +63,12 @@ while True:
    elif option=='3':
        GTMaster = pd.read_csv('GTM.csv')
        GTM = input("GTM Type : ")
-#       if GTMaster[GTM][0] == 40:
-#           sizeGTM = "large"
-#       elif GTMaster[GTM][0] == 5:
-#            sizeGTM = "small"
-#       else:
-#           sizeGTM = "medium"
        Status = input("Status GTM : ")
-       if Status == "OUT":
-           GTMtoPRS = GTMaster[GTM][3]
-           
-       if Status == "Stand-By":
+       if Status == "StandBy":
            PRSReady = {}
            SurvivalTable = pd.read_csv('SurvivalTable.csv')
            for i in dataset[:]["PRS"]:
-               if SurvivalTable[i][0] > Distance[i][GTMaster[GTM][1]] and size[i] == GTMaster[GTM][0] and Distance[i][GTMaster[GTM][1]] > 0.0 :
+               if SurvivalTable[i][0] > Distance[i][GTMaster[GTM][1]] and size[i] == int(GTMaster[GTM][0]) and Distance[i][GTMaster[GTM][1]] > 0.0 :
                    PRSReady[i] = SurvivalTable[i][0]
            sorted_x = sorted(PRSReady.items(), key=operator.itemgetter(1))
            minST = sorted_x[0][1]
@@ -85,17 +76,17 @@ while True:
            for j in range(len(sorted_x)):
                if sorted_x[j][1] == minST:
                    Prioritas[sorted_x[j][0]] = category[sorted_x[j][0]] * produksi[sorted_x[j][0]]
-           sorted_y = sorted(Prioritas.items(), key=operator.itemgetter(1))
-           if SurvivalTable[i][0] - Distance[i][GTMaster[GTM][1]] < 1.0:
-               Status = "OUT"
-               GTMtoPRS = sorted_y[0][0]
-           else:
-               GTMaster[GTM][3] = sorted_y[0][0]
-               c.send(str(sorted_y[0][0]).encode('utf-8'))
-               
-       if Status == "OUT":
-           c.send(str(GTMtoPRS).encode('utf-8'))
-       GTMaster[GTM][2]= Status
+        sorted_y = sorted(Prioritas.items(), key=operator.itemgetter(1))
+            if SurvivalTable[i][0] - Distance[i][GTMaster[GTM][1]] < 1.0:
+                Status = "OUT"
+                GTMtoPRS = sorted_y[0][0]
+            else:
+                GTMaster[GTM][3] = sorted_y[0][0]
+                message = "Survival Time masih Lama"
+                c.send(message.encode('utf-8'))
+        if Status == "OUT":
+            c.send(str(GTMtoPRS).encode('utf-8'))
+            GTMaster[GTM][2]= Status
        GTMaster.to_csv('GTM.csv', index=False)
    elif option=='4':
        PRS = str(input("PRS Code :"))
