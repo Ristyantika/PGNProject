@@ -1,0 +1,18 @@
+Query :
+Status GTM - Tujuan GTM - P - F
+SELECT mastergtm.NoGTM, masterprs.NamaPRS, datacater.Flow, datacater.PressureOutlet, datacater.PressureGTM, 
+mastergtm.KapasitasGTM, masterstatus.NamaStatus
+FROM mastergtm JOIN datacater ON mastergtm.Id = datacater.IdGTM
+JOIN masterprs ON masterprs.Id = datacater.IdPRS
+JOIN datagtm ON mastergtm.Id = datagtm.IdGTM
+JOIN masterstatus ON datagtm.Status = masterstatus.Id
+WHERE datagtm.Status = 4;
+
+
+STATUS MS
+SElECT mastermotherstation.NamaMS, mastergtm.NoGTM, mastermotherstation.KapasitasMS, 
+mastergtm.KapasitasGTM, masterstatus.NamaStatus
+FROM datams JOIN mastermotherstation ON datams.IdMS = mastermotherstation.Id
+JOIN mastergtm ON datams.IdGTM = mastergtm.Id
+JOIN masterstatus ON datams.Status = masterstatus.Id
+where datams.Status = 10; 
